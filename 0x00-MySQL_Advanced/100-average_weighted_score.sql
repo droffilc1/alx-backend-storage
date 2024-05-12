@@ -1,7 +1,7 @@
 -- creates a stored procedure ComputeAverageWeightedScoreForUser that computes and store the average weighted score for a student
 DELIMITER $$
 
-CREATE PROCEDURE ComputerAVerageWeightedScoreForUser(IN user_id INT)
+CREATE PROCEDURE ComputeAverageWeightedScoreForUser(IN user_id INT)
 BEGIN
     UPDATE users
     SET average_score = (
