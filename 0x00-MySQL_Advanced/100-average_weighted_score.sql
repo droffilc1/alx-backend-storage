@@ -1,13 +1,13 @@
 -- creates a stored procedure ComputeAverageWeightedScoreForUser that computes and store the average weighted score for a student
 DELIMITER $$
 
-CREATE PROCEDURE ComputerAVeerageWeightedScoreForUser(IN user_id INT)
+CREATE PROCEDURE ComputerAVerageWeightedScoreForUser(IN user_id INT)
 BEGIN
     UPDATE users
     SET average_score = (
-      SELECT SUM(c.score * p.weight / SUM(p.weight)
+      SELECT SUM(c.score * p.weight) / SUM(p.weight)
       FROM corrections c
-      INNER JOIN projects p on p.id = c.project_id
+      INNER JOIN projects p ON p.id = c.project_id
       WHERE c.user_id = user_id
   )
   WHERE id = user_id;
