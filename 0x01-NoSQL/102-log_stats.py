@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" 12-log_stats """
+""" 102-log_stats """
 
 from pymongo import MongoClient
 
@@ -22,6 +22,17 @@ def log_stats(mongo_collection):
     status_check_count = mongo_collection.count_documents(
         {"method": "GET", "path": "/status"})
     print(f"{status_check_count} status check")
+
+    # IP stats
+    top_ips = mongo_collection.aggregate([
+        {"$group": {"_id": "$ip", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 10}
+    ])
+
+    print("IPs:")
+    for ips in top_ips:
+        print(f"\t{ips['_id']}: {ips[['count']]}")
 
 
 if __name__ == "__main__":
