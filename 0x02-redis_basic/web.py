@@ -1,27 +1,37 @@
 #!/usr/bin/env python3
 """ web """
 
-import requests
-import redis
 from functools import wraps
 from typing import Callable
+import requests
+import redis
 
+# Initialize Redis client
 r = redis.Redis()
 
 
 def count_requests(method: Callable) -> Callable:
     """Tracks how many times a particular URL was accessed
-    in the key "count:{url}" and cache the result with an expiration
+    in the key 'count:{url}' and caches the result with an expiration
     time of 10 seconds.
     """
     @wraps(method)
     def wrapper(url):
-        r.incr(f"count:{url}")
-        cached_html = r.get(f"cached:{url}")
+        count_key = f"count:{url}"
+        cache_key = f"cached:{url}"
+
+        # Increment the access count
+        r.incr(count_key)
+
+        # Check if the result is already cached
+        cached_html = r.get(cache_key)
         if cached_html:
             return cached_html.decode('utf-8')
+
+        # Fetch the content and cache it
         html = method(url)
-        r.setex(f"cached:{url}", 10, html)
+        r.setex(cache_key, 10, html)
+
         return html
     return wrapper
 
@@ -34,5 +44,4 @@ def get_page(url: str) -> str:
 
 
 if __name__ == "__main__":
-    html_content = get_page('http://slowwly.robertomurray.co.uk')
-    print(html_content)
+    get_page('http://google.com')
