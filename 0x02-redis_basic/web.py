@@ -17,21 +17,17 @@ def count_requests(method: Callable) -> Callable:
     """
     @wraps(method)
     def wrapper(url):
-        count_key = f"count:{url}"
-        cache_key = f"cached:{url}"
-
         # Increment the access count
-        r.incr(count_key)
+        r.incr(f"count:{url}")
 
         # Check if the result is already cached
-        cached_html = r.get(cache_key)
+        cached_html = r.get(f"cached:{url}")
         if cached_html:
             return cached_html.decode('utf-8')
 
         # Fetch the content and cache it
         html = method(url)
-        r.setex(cache_key, 10, html)
-
+        r.setex(f"cached:{url}", 10, html)
         return html
     return wrapper
 
